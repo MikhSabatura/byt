@@ -26,7 +26,7 @@ public class Currency {
      * @return The value of amount in the "universal currency"
      */
     public Integer universalValue(Integer amount) {
-        return new Double(amount / rate).intValue();
+        return (int) (amount * rate);
     }
 
     /**
@@ -63,7 +63,24 @@ public class Currency {
      * @param othercurrency The other Currency
      */
     public Integer valueInThisCurrency(Integer amount, Currency othercurrency) {
-        return new Double(amount / othercurrency.rate * this.rate).intValue();
+        return (int) (othercurrency.universalValue(amount) / this.rate);
     }
-    // TODO: 15/11/2018 return smth meaninful
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Currency currency = (Currency) o;
+
+        if (!name.equals(currency.name)) return false;
+        return rate.equals(currency.rate);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name.hashCode();
+        result = 31 * result + rate.hashCode();
+        return result;
+    }
 }
