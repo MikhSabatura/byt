@@ -39,18 +39,25 @@ public class AccountTest {
 
     @Test
     public void testTimedPayment() throws AccountDoesNotExistException {
+        int interval = 2;
+        int next = 2;
         /*
          * getting the initial account balance
          * */
         Money expected = testAccount.getBalance();
         Money withdrawn = new Money(100, SEK);
-        testAccount.addTimedPayment("Insurance", 1, 0, withdrawn, SweBank, "Alice");
+        testAccount.addTimedPayment("Insurance", interval, next, withdrawn, SweBank, "Alice");
         /*
          * performing timed payment 10 times
          * */
         for (int i = 0; i < 10; i++) {
             testAccount.tick();
-            expected = expected.sub(withdrawn); // decreasing the initial balance by the withdrawn amount
+            if (next == 0) {
+                next = interval;
+                expected = expected.sub(withdrawn); // decreasing the initial balance by the withdrawn amount
+            } else {
+                next -= 1;
+            }
         }
         /*checking if the amount of withdrawn money is correct*/
         assertEquals(expected, testAccount.getBalance());

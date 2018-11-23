@@ -1,9 +1,9 @@
 package b_Money;
 
-import static org.junit.Assert.*;
-
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 public class BankTest {
     Currency SEK, DKK;
@@ -150,21 +150,38 @@ public class BankTest {
     /*asserting that AccountDoesNotExistException is thrown*/
     @Test(expected = AccountDoesNotExistException.class)
     public void testTimedPayment() throws AccountDoesNotExistException {
+        int interval = 5;
+        int next = 5;
+        Money withdrawn = new Money(1000, SEK);
         try {
             /*
-             * adding a valid timed payment and checking if any exceptions are thrown
+             * getting initial amount of money deposited on the account
              * */
-            SweBank.addTimedPayment("Bob", "BobInsurance", 5, 5, new Money(1000, SEK), DanskeBank, "Gertrud");
+            String fromAcc = "Bob";
+            int expectedAmount = SweBank.getBalance(fromAcc);
+            /*
+             * adding a timed payment and decreasing the initial(expected) amount by the withdrawn sum
+             * every time the timed payment should be performed
+             * */
+            SweBank.addTimedPayment(fromAcc, "BobInsurance", interval, next, withdrawn, DanskeBank, "Gertrud");
             for (int i = 0; i < 10; i++) {
                 SweBank.tick();
+                if (next == 0) {
+                    next = interval;
+                    expectedAmount -= withdrawn.getAmount();
+                } else {
+                    next--;
+                }
             }
+            /*checking if the manually decreased amount equals the account balance*/
+            assertEquals(expectedAmount, SweBank.getBalance(fromAcc).intValue());
         } catch (AccountDoesNotExistException e) {
             fail("Should not throw an exception");
         }
         /*
          * adding a timed payment from a non-existent account
          * */
-        DanskeBank.addTimedPayment("NonExistentAcc", "Insurance", 1, 0, new Money(1000, SEK), Nordea, "Bob");
+        DanskeBank.addTimedPayment("NonExistentAcc", "Insurance", 1, 0, withdrawn, Nordea, "Bob");
         DanskeBank.tick();
     }
 }
