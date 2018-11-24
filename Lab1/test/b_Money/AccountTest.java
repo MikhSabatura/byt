@@ -33,14 +33,19 @@ public class AccountTest {
         /*
          * checking if the methods work without throwing exceptions
          * */
-        testAccount.addTimedPayment("Insurance", 1, 1, new Money(100, SEK), SweBank, "Alice");
+        String paymentId = "Insurance";
+        testAccount.addTimedPayment(paymentId, 1, 1, new Money(100, SEK), SweBank, "Alice");
+        assertTrue(testAccount.timedPaymentExists(paymentId));
+
         testAccount.removeTimedPayment("Insurance");
+        assertFalse(testAccount.timedPaymentExists(paymentId));
     }
 
     @Test
     public void testTimedPayment() throws AccountDoesNotExistException {
         int interval = 2;
         int next = 2;
+        int tickCount = 10;
         /*
          * getting the initial account balance
          * */
@@ -48,9 +53,9 @@ public class AccountTest {
         Money withdrawn = new Money(100, SEK);
         testAccount.addTimedPayment("Insurance", interval, next, withdrawn, SweBank, "Alice");
         /*
-         * performing timed payment 10 times
+         * performing timed payment n times
          * */
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < tickCount; i++) {
             testAccount.tick();
             if (next == 0) {
                 next = interval;

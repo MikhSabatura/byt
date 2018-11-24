@@ -79,7 +79,7 @@ public class Bank {
             throw new AccountDoesNotExistException();
         } else {
             Account account = accountlist.get(accountid);
-            account.deposit(money);
+            account.withdraw(money); //bug: deposited instead of withdrawing
         }
     }
 
@@ -125,7 +125,8 @@ public class Bank {
      * @throws AccountDoesNotExistException If one of the accounts do not exist
      */
     public void transfer(String fromaccount, String toaccount, Money amount) throws AccountDoesNotExistException {
-        transfer(fromaccount, this, fromaccount, amount);
+        transfer(fromaccount, this, toaccount, amount);
+        //bug: transferred from fromAcc to fromAcc instead of toAcc
     }
 
     /**

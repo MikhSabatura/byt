@@ -16,6 +16,7 @@ public class BankTest {
         SweBank = new Bank("SweBank", SEK);
         Nordea = new Bank("Nordea", SEK);
         DanskeBank = new Bank("DanskeBank", DKK);
+
         SweBank.openAccount("Ulrika");
         SweBank.openAccount("Bob");
         Nordea.openAccount("Bob");
@@ -43,6 +44,10 @@ public class BankTest {
             Nordea.openAccount("Angela");
             SweBank.openAccount("Steve");
             DanskeBank.openAccount("Bob");
+
+            assertNotNull(Nordea.getBalance("Angela"));
+            assertNotNull(SweBank.getBalance("Steve"));
+            assertNotNull(DanskeBank.getBalance("Bob"));
         } catch (AccountExistsException e) {
             /*
              * checking if creating a new account causes an exception
@@ -66,9 +71,21 @@ public class BankTest {
     @Test(expected = AccountDoesNotExistException.class)
     public void testDeposit() throws AccountDoesNotExistException {
         try {
-            Nordea.deposit("Bob", new Money(1000, SEK));
-            SweBank.deposit("Bob", new Money(1000, SEK));
-            DanskeBank.deposit("Gertrud", new Money(1000, DKK));
+            int initialBob = Nordea.getBalance("Bob");
+            int initialUlrika = SweBank.getBalance("Ulrika");
+            int initialGertrud = DanskeBank.getBalance("Gertrud");
+
+            int depositAmount = 1000;
+            int depositCount = 5;
+            for (int i = 0; i < depositCount; i++) {
+                Nordea.deposit("Bob", new Money(depositAmount, SEK));
+                SweBank.deposit("Ulrika", new Money(depositAmount, SEK));
+                DanskeBank.deposit("Gertrud", new Money(depositAmount, DKK));
+
+            }
+            assertEquals(initialBob + depositAmount * depositCount, Nordea.getBalance("Bob").intValue());
+            assertEquals(initialUlrika + depositAmount * depositCount, SweBank.getBalance("Ulrika").intValue());
+            assertEquals(initialGertrud + depositAmount * depositCount, DanskeBank.getBalance("Gertrud").intValue());
         } catch (AccountDoesNotExistException e) {
             /*
              * checking if depositing to existent accounts causes an exception
@@ -79,8 +96,6 @@ public class BankTest {
          * checking if depositing to a non-existent account throws an exception
          * */
         Nordea.deposit("NonExistentAcc", new Money(1000, SEK));
-        SweBank.deposit("NonExistentAcc", new Money(1000, SEK));
-        DanskeBank.deposit("NonExistentAcc", new Money(1000, DKK));
     }
 
     //failed: withdrawing from an existent account throwed an exception
@@ -88,9 +103,20 @@ public class BankTest {
     @Test(expected = AccountDoesNotExistException.class)
     public void testWithdraw() throws AccountDoesNotExistException {
         try {
-            Nordea.withdraw("Bob", new Money(1000, SEK));
-            SweBank.withdraw("Bob", new Money(1000, SEK));
-            DanskeBank.withdraw("Gertrud", new Money(1000, DKK));
+            int initialBob = Nordea.getBalance("Bob");
+            int initialUlrika = SweBank.getBalance("Ulrika");
+            int initialGertrud = DanskeBank.getBalance("Gertrud");
+
+            int withdrawnAmount = 1000;
+            int withdrawCount = 5;
+            for (int i = 0; i < withdrawCount; i++) {
+                Nordea.withdraw("Bob", new Money(withdrawnAmount, SEK));
+                SweBank.withdraw("Ulrika", new Money(withdrawnAmount, SEK));
+                DanskeBank.withdraw("Gertrud", new Money(withdrawnAmount, DKK));
+            }
+            assertEquals(initialBob - withdrawnAmount * withdrawCount, Nordea.getBalance("Bob").intValue());
+            assertEquals(initialUlrika - withdrawnAmount * withdrawCount, SweBank.getBalance("Ulrika").intValue());
+            assertEquals(initialGertrud - withdrawnAmount * withdrawCount, DanskeBank.getBalance("Gertrud").intValue());
         } catch (AccountDoesNotExistException e) {
             /*
              * checking if withdrawing from existent accounts throws an exception
@@ -110,31 +136,42 @@ public class BankTest {
     public void testGetBalance() throws AccountDoesNotExistException {
         try {
             /*
-             * checking if the returned balance is null
+             * checking if the returned balance is correct
              * */
-            String msg = "Should not be null";
-            assertNotNull(msg, SweBank.getBalance("Bob"));
-            assertNotNull(msg, Nordea.getBalance("Bob"));
-            assertNotNull(msg, DanskeBank.getBalance("Gertrud"));
+            String msg = "Should equal 0";
+            assertEquals(msg, 0, SweBank.getBalance("Bob").intValue());
+            assertEquals(msg, 0, Nordea.getBalance("Bob").intValue());
+            assertEquals(msg, 0, DanskeBank.getBalance("Gertrud").intValue());
         } catch (AccountDoesNotExistException e) {
             /*
              * checking if getting balance of existent accounts throws an exception
              * */
             fail("Should not throw an exception");
         }
+        /*
+         * checking if getting balance of non-existent account throws an exception
+         * */
         SweBank.getBalance("NonExistentAcc");
-        Nordea.getBalance("NonExistentAcc");
-        DanskeBank.getBalance("NonExistentAcc");
     }
 
     //failed because of null-pointer exception
     @Test(expected = AccountDoesNotExistException.class)
     public void testTransfer() throws AccountDoesNotExistException {
         try {
-            SweBank.transfer("Bob", Nordea, "Bob", new Money(1000, SEK));
-            SweBank.transfer("Bob", SweBank, "Bob", new Money(1000, SEK));
-            DanskeBank.transfer("Gertrud", SweBank, "Ulrika", new Money(1000, DKK));
-            SweBank.transfer("Bob", "Ulrika", new Money(1000, DKK));
+            int initialBobNordea = Nordea.getBalance("Bob");
+            int initialBobSwe = SweBank.getBalance("Bob");
+            int initialUlrika = SweBank.getBalance("Ulrika");
+
+            int withdrawnAmount = 1000;
+            int withdrawCount = 5;
+
+            for (int i = 0; i < withdrawCount; i++) {
+                Nordea.transfer("Bob", SweBank, "Ulrika", new Money(1000, SEK));
+                SweBank.transfer("Bob", "Ulrika", new Money(1000, SEK));
+            }
+            assertEquals(initialBobNordea - withdrawnAmount * withdrawCount, Nordea.getBalance("Bob").intValue());
+            assertEquals(initialBobSwe - withdrawnAmount * withdrawCount, SweBank.getBalance("Bob").intValue());
+            assertEquals(initialUlrika + (withdrawnAmount * withdrawCount) * 2, SweBank.getBalance("Ulrika").intValue());
         } catch (AccountDoesNotExistException e) {
             /*
              * checking if performing transfer between existent accounts throws an exception
@@ -142,6 +179,9 @@ public class BankTest {
             e.printStackTrace();
             fail("Should not throw an exception");
         }
+        /*
+         * checking if performing transfer from non-existing account throws an exception
+         * */
         SweBank.transfer("NonExistentAcc", "Bob", new Money(1000, SEK));
         DanskeBank.transfer("NonExistentAcc", SweBank, "Ulrika", new Money(1000, DKK));
     }
@@ -152,6 +192,7 @@ public class BankTest {
     public void testTimedPayment() throws AccountDoesNotExistException {
         int interval = 5;
         int next = 5;
+        int tickCount = 20;
         Money withdrawn = new Money(1000, SEK);
         try {
             /*
@@ -164,7 +205,7 @@ public class BankTest {
              * every time the timed payment should be performed
              * */
             SweBank.addTimedPayment(fromAcc, "BobInsurance", interval, next, withdrawn, DanskeBank, "Gertrud");
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < tickCount; i++) {
                 SweBank.tick();
                 if (next == 0) {
                     next = interval;
