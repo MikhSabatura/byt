@@ -6,33 +6,19 @@ import org.junit.Test;
 
 import java.io.*;
 
+import static org.junit.Assert.*;
+
 public class PersonClientsTest {
 
-	@Test
-	public void testClients() throws IOException {
-		Person bobSmith = new Person("Smith", "Bob", null);
-		Person jennyJJones = new Person("Jones", "Jenny", "J");
+    @Test
+    public void testClients() throws IOException {
+        Person bobSmith = new Person("Smith", "Bob", null);
+        Person jennyJJones = new Person("Jones", "Jenny", "J");
 
-		StringWriter out = new StringWriter();
-		Client1.printPerson(out, bobSmith);
-		assertEquals("Bob Smith", out.toString());
+        assertEquals("Bob Smith", bobSmith.toString());
+        assertEquals("Jenny J Jones", jennyJJones.toString());
 
-		out = new StringWriter();
-		Client1.printPerson(out, jennyJJones);
-		assertEquals("Jenny J Jones", out.toString());
-
-		assertEquals("Smith, Bob", Client2.formatPerson(bobSmith));
-		assertEquals("Jones, Jenny J", Client2.formatPerson(jennyJJones));
-
-		out = new StringWriter();
-		Client3.display(out, bobSmith);
-		assertEquals("Smith, Bob", out.toString());
-
-		out = new StringWriter();
-		Client3.display(out, jennyJJones);
-		assertEquals("Jones, Jenny J", out.toString());
-
-		assertEquals("Smith, Bob", Client4.toString(bobSmith));
-		assertEquals("Jones, Jenny J", Client4.toString(jennyJJones));
-	}
+        assertEquals("Smith, Bob", bobSmith.formattedName());
+        assertEquals("Jones, Jenny J", jennyJJones.formattedName());
+    }
 }
