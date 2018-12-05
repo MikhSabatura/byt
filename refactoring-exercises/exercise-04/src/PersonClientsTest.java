@@ -22,3 +22,4 @@ public class PersonClientsTest {
         assertEquals("Jones, Jenny J", jennyJJones.formattedName());
     }
 }
+
