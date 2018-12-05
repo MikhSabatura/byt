@@ -15,6 +15,10 @@ public class Person {
         return last + ", " + first + (middle == null ? "" : " " + middle);
     }
 
+    /*
+     * problem: lazy classes with redundant functionality
+     * solution: collapse hierarchy
+     * */
     @Override
     public String toString() {
         return first + " " + (middle == null ? "" : middle + " ") + last;
