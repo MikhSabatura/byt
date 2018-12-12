@@ -8,8 +8,6 @@ import java.util.*;
 
 public class WebPageMonitor {
 
-    private static final int SLEEP_TIME = 60 * 1000;
-
     private Map<URL, Date> _lastModified;
     private Map<URL, Set<IObserver>> _observers;
 
@@ -19,12 +17,14 @@ public class WebPageMonitor {
     }
 
     /**
-     * regularly updates information about the modification dates
+     * Regularly updates information about the modification dates
+     *
+     * @param updatePeriod period between updating
      */
-    public void monitor() {
+    public void monitor(int updatePeriod) {
         while (true) {
             try {
-                Thread.sleep(SLEEP_TIME);
+                Thread.sleep(updatePeriod);
                 _lastModified.keySet().forEach(this::updateLastModified);
             } catch (InterruptedException e) {
                 return;
@@ -33,14 +33,14 @@ public class WebPageMonitor {
     }
 
     /**
-     * updates last modified date for the passed url and notifies attached observers
+     * Updates last modified date for the passed url and notifies attached observers
      *
      * @param url url for which last modified date will be updated
      */
     private void updateLastModified(URL url) {
         Date currLastModified = null;
         try {
-            currLastModified = getServerLastModified(url);
+            currLastModified = getLastModified(url);
         } catch (IOException e) {
             throw new WebPageMonitorException("couldn't load last updated date", e);
         }
@@ -54,7 +54,7 @@ public class WebPageMonitor {
      * @param url url for which last modified date will be checked
      * @return date when the page under passed url was modified
      */
-    private Date getServerLastModified(URL url) throws IOException {
+    private Date getLastModified(URL url) throws IOException {
         return new Date(url.openConnection().getLastModified());
     }
 
@@ -67,31 +67,40 @@ public class WebPageMonitor {
     }
 
     /**
-     * adds the url to the set of monitored in case it isn't already
+     * Adds the url to the set of monitored url-s
      *
      * @param url url of the page which will be added to the set of monitored
      */
     public void addMonitoredPage(URL url) {
         try {
-            _lastModified.putIfAbsent(url, getServerLastModified(url));
+            _lastModified.putIfAbsent(url, getLastModified(url));
+            _observers.putIfAbsent(url, new HashSet<IObserver>());
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * Removes the url from the set of monitored url-s
+     *
+     * @param url url of the page which will be removed from the set of monitored
+     */
     public void removeMonitoredPage(URL url) {
         _lastModified.remove(url);
         _observers.remove(url);
     }
 
     /**
+     * Attaches the observer to the url and updates date in observer.
+     * Adds url to the monitored in case it is not.
+     *
      * @param url      url to which the observer will be attached
      * @param observer observer that will be attached to the url
      */
     public void addObserver(URL url, IObserver observer) {
         addMonitoredPage(url);
-        _observers.putIfAbsent(url, new HashSet<IObserver>());
         _observers.get(url).add(observer);
+        observer.update(_lastModified.get(url));
     }
 
     /**
