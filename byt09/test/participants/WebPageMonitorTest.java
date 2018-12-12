@@ -8,6 +8,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.*;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -27,17 +28,20 @@ public class WebPageMonitorTest {
     public void setUp() throws Exception {
         int urlCount = 25;
         int observersPerUrl = 2;
+        int responseCount = 100;
+        String urlFormatString = "http://google%d.com";
+
+        responses = LongStream.range(System.currentTimeMillis(), System.currentTimeMillis() + responseCount)
+                .boxed()
+                .toArray(Long[]::new);
 
         observers = IntStream.range(0, urlCount * observersPerUrl)
                 .mapToObj(i -> new WebPageObserver(String.valueOf(i)))
                 .collect(Collectors.toList());
 
-        responses = LongStream.range(System.currentTimeMillis(), System.currentTimeMillis() + 100)
-                .boxed()
-                .toArray(Long[]::new);
-
         urls = LongStream.range(1, 1 + urlCount)
-                .mapToObj(this::mockURL)
+                .mapToObj(i -> String.format(urlFormatString, i))
+                .map(this::mockURL)
                 .collect(Collectors.toList());
 
         monitor = new WebPageMonitor();
@@ -63,43 +67,37 @@ public class WebPageMonitorTest {
         /*
          * before updating the dates for the first time all of them should be null
          * */
-        observers.forEach(o -> Assert.assertNull(o.getLastModified()));
+        observers.forEach(o -> Assert.assertEquals((long) responses[0], o.getLastModified().getTime()));
         for (URL url : urls) {
             updateLastModified.invoke(monitor, url);
         }
         /*
-         * checking if all of the dates were set to some value after updating
+         * updating change dates and check if they were set correctly
          * */
-        observers.forEach(o -> Assert.assertNotNull(o.getLastModified()));
-        /*
-         *
-         * */
-//        for (Long response : responses) {
+        for (int i = 3; i < responses.length; i++) { // starting with 3 because mockito starts returning responses from 3 index
             for (URL url : urls) {
                 updateLastModified.invoke(monitor, url);
             }
             for (IObserver o : observers) {
-                Assert.assertEquals((long)responses[0], o.getLastModified().getTime());
+                Assert.assertEquals((long) responses[i], o.getLastModified().getTime());
             }
-//        }
+        }
     }
 
-    private URL mockURL(long num) {
-        String path = "http://google" + num + ".com";
-
+    private URL mockURL(String urlString) {
         //mocking HttpURLConnection by URLStreamHandler since URL class is final and cannot be mocked
-        HttpURLConnection mockCon = mock(HttpURLConnection.class);
-        when(mockCon.getLastModified()).thenReturn(responses[0], responses);
+        HttpURLConnection mockConnection = mock(HttpURLConnection.class);
+        when(mockConnection.getLastModified()).thenReturn(responses[0], responses);
 
         URLStreamHandler stubURLStreamHandler = new URLStreamHandler() {
             @Override
             protected URLConnection openConnection(URL u) throws IOException {
-                return mockCon;
+                return mockConnection;
             }
         };
 
         try {
-            return new URL(null, path, stubURLStreamHandler);
+            return new URL(null, urlString, stubURLStreamHandler);
         } catch (MalformedURLException e) {
             e.printStackTrace();
             return null;
