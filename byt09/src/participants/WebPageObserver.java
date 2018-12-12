@@ -4,10 +4,21 @@ import java.util.Date;
 
 public class WebPageObserver implements IObserver {
 
+    private String id;
     private Date lastModified;
+
+    public WebPageObserver(String id) {
+        this.id = id;
+    }
 
     @Override
     public void update(Date newLastModified) {
-        System.out.println("the web page was modified, new modify date = " + lastModified);
+        lastModified = newLastModified;
+        System.out.printf("observer #%-3s| new date: %25s%n", id, lastModified.toString());
+    }
+
+    @Override
+    public Date getLastModified() {
+        return lastModified;
     }
 }
