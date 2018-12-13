@@ -2,13 +2,9 @@ package memento;
 
 import common.TestUtils;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
-import participants.WebPageMonitor;
 
 import java.io.*;
-import java.lang.reflect.Method;
-import java.net.URL;
 import java.util.HashMap;
 
 public class WebMonitorMementoTest extends TestUtils {
