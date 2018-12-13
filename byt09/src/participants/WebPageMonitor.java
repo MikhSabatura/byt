@@ -119,7 +119,8 @@ public class WebPageMonitor {
         return new WebMonitorMemento(new WebMonitorState(_lastModifiedDates, _observers));
     }
 
-    public void setMonitorMemento(WebMonitorMemento memento) {
-
+    public void setMemento(WebMonitorMemento memento) {
+        _observers = memento.getState().getObservers();
+        _lastModifiedDates = memento.getState().getLastModifiedDates();
     }
 }

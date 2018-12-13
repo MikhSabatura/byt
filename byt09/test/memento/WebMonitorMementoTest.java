@@ -16,14 +16,14 @@ public class WebMonitorMementoTest extends TestUtils {
         Assert.assertNotEquals(0, beforeState.getObservers().size());
 
         WebMonitorState newState = new WebMonitorState(new HashMap<>(), new HashMap<>());
-        monitor.setMonitorMemento(new WebMonitorMemento(newState));
+        monitor.setMemento(new WebMonitorMemento(newState));
         Assert.assertEquals(0, monitor.getMemento().getState().getLastModifiedDates().size());
         Assert.assertEquals(0, monitor.getMemento().getState().getObservers().size());
     }
 
     @Test
     public void saveStateTest() throws Exception {
-        File file = new File("./serialized/");
+        File file = new File("./serialized/state.ser");
         ObjectOutputStream outStream = new ObjectOutputStream(new FileOutputStream(file));
         WebMonitorState oldState = monitor.getMemento().getState();
         outStream.writeObject(oldState);
