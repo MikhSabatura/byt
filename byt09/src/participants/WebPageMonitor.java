@@ -1,6 +1,8 @@
 package participants;
 
 import exceptions.WebPageMonitorException;
+import memento.WebMonitorMemento;
+import memento.WebMonitorState;
 
 import java.io.IOException;
 import java.net.URL;
@@ -8,11 +10,11 @@ import java.util.*;
 
 public class WebPageMonitor {
 
-    private Map<URL, Date> _lastModified;
+    private Map<URL, Date> _lastModifiedDates;
     private Map<URL, Set<IObserver>> _observers;
 
     {
-        _lastModified = new HashMap<>();
+        _lastModifiedDates = new HashMap<>();
         _observers = new HashMap<>();
     }
 
@@ -25,7 +27,7 @@ public class WebPageMonitor {
         while (true) {
             try {
                 Thread.sleep(updatePeriod);
-                _lastModified.keySet().forEach(this::updateLastModified);
+                _lastModifiedDates.keySet().forEach(this::updateLastModified);
             } catch (InterruptedException e) {
                 return;
             }
@@ -44,8 +46,8 @@ public class WebPageMonitor {
         } catch (IOException e) {
             throw new WebPageMonitorException("couldn't load last updated date", e);
         }
-        if (!_lastModified.get(url).equals(currLastModified)) {
-            _lastModified.put(url, currLastModified);
+        if (!_lastModifiedDates.get(url).equals(currLastModified)) {
+            _lastModifiedDates.put(url, currLastModified);
             notifyObservers(url, currLastModified);
         }
     }
@@ -73,7 +75,7 @@ public class WebPageMonitor {
      */
     public void addMonitoredPage(URL url) {
         try {
-            _lastModified.putIfAbsent(url, getLastModified(url));
+            _lastModifiedDates.putIfAbsent(url, getLastModified(url));
             _observers.putIfAbsent(url, new HashSet<IObserver>());
         } catch (IOException e) {
             e.printStackTrace();
@@ -86,7 +88,7 @@ public class WebPageMonitor {
      * @param url url of the page which will be removed from the set of monitored
      */
     public void removeMonitoredPage(URL url) {
-        _lastModified.remove(url);
+        _lastModifiedDates.remove(url);
         _observers.remove(url);
     }
 
@@ -100,7 +102,7 @@ public class WebPageMonitor {
     public void addObserver(URL url, IObserver observer) {
         addMonitoredPage(url);
         _observers.get(url).add(observer);
-        observer.update(_lastModified.get(url));
+        observer.update(_lastModifiedDates.get(url));
     }
 
     /**
@@ -111,5 +113,13 @@ public class WebPageMonitor {
         if (_observers.containsKey(url)) {
             _observers.get(url).remove(observer);
         }
+    }
+
+    public WebMonitorMemento getMemento() {
+        return new WebMonitorMemento(new WebMonitorState(_lastModifiedDates, _observers));
+    }
+
+    public void setMonitorMemento(WebMonitorMemento memento) {
+
     }
 }
