@@ -3,9 +3,9 @@ import java.util.List;
 
 public class Recipe {
 
-    private String name; // <= 50 symbols
-    private String instructions; // <= 500 symbols
-    private List<Ingredient> ingredients; // > 0 && <= 40 ingredients
+    private String name; //!empty && <= 50 symbols
+    private String instructions; //!empty && <= 500 symbols
+    private List<Ingredient> ingredients; //!empty && <= 40 ingredients
 
     private List<Rating> ratings;
     private List<Review> reviews;
@@ -68,8 +68,8 @@ public class Recipe {
     }
 
     public void setName(String name) {
-        if (name.length() > 50) {
-            throw new IllegalArgumentException("Name should be <= 50 symbols");
+        if (name.length() == 0 || name.length() > 50) {
+            throw new IllegalArgumentException("Name should be <= 50 symbols and not empty");
         }
         this.name = name;
     }
@@ -79,8 +79,8 @@ public class Recipe {
     }
 
     public void setInstructions(String instructions) {
-        if (instructions.length() > 500) {
-            throw new IllegalArgumentException("Instructions should be <= 500 symbols");
+        if (instructions.length() == 0 || instructions.length() > 500) {
+            throw new IllegalArgumentException("Instructions should be <= 500 symbols and not empty");
         }
         this.instructions = instructions;
     }
@@ -94,11 +94,8 @@ public class Recipe {
     }
 
     public void setIngredients(List<Ingredient> ingredients) {
-        if (ingredients.isEmpty()) {
-            throw new IllegalArgumentException("There should be at least 1 ingredient");
-        }
-        if (ingredients.size() > 40) {
-            throw new IllegalArgumentException("There should be <= 40 ingredients");
+        if (ingredients.isEmpty() || ingredients.size() > 40) {
+            throw new IllegalArgumentException("There should be <= 40 ingredients and not empty");
         }
         this.ingredients = ingredients;
     }

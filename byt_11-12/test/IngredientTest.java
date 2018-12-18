@@ -27,16 +27,16 @@ public class IngredientTest {
     @Test
     public void setNameTest() {
         /*
-         * checking if assigning correct values causes an exception
+         * checking if assigning correct values causes an exception:
          * */
         try {
             ingredient.setName(str1);
             ingredient.setName(str50);
         } catch (IllegalArgumentException e) {
-            Assert.fail("Should not throw exception");
+            Assert.fail("Should not throw an exception");
         }
         /*
-         * checking if assigning incorrect values causes an exception
+         * checking if assigning incorrect values causes an exception:
          * */
         try {
             ingredient.setName(str0);
@@ -53,7 +53,7 @@ public class IngredientTest {
     @Test
     public void setDescriptionTest() {
         /*
-         * checking if assigning correct values causes an exception
+         * checking if assigning correct values causes an exception:
          * */
         try {
             ingredient.setDescription(str50);
@@ -63,7 +63,7 @@ public class IngredientTest {
             Assert.fail("Should not throw an exception");
         }
         /*
-         * checking if assigning incorrect values causes an exception
+         * checking if assigning incorrect values causes an exception:
          * */
         try {
             ingredient.setDescription(str0);

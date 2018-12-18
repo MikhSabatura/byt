@@ -1,8 +1,6 @@
 import org.junit.*;
 
-import java.io.File;
 import java.lang.reflect.Field;
-import java.util.Random;
 
 public class RatingTest {
 
@@ -34,7 +32,7 @@ public class RatingTest {
     @Test
     public void setAssessmentTest() {
         /*
-         * checking if assigning correct values causes an exception
+         * checking if assigning correct values causes an exception:
          * */
         try {
             for (double i = MIN_ASSESSMENT; i < MAX_ASSESSMENT; i++) {
@@ -44,7 +42,7 @@ public class RatingTest {
             Assert.fail("Should not throw an exception");
         }
         /*
-         * checking if assigning incorrect values causes an exception
+         * checking if assigning incorrect values causes an exception:
          * */
         try {
             rating.setAssessment(MIN_ASSESSMENT - 1);
