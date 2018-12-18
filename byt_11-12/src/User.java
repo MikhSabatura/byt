@@ -3,11 +3,11 @@ import java.util.List;
 
 public class User {
 
-    private String name; // <= 50
-    private String surname; // <= 50
+    private String name; //!empty <= 50
+    private String surname; //!empty <= 50
 
-    private String email; // <= 50
-    private String phoneNumber; // <= 30
+    private String email; //!empty <= 50
+    private String phoneNumber; //!empty <= 30
 
     private List<User> friends;
     private List<Recipe> cookedRecipes;
