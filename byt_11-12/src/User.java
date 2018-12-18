@@ -77,7 +77,7 @@ public class User {
     }
 
     public void setName(String name) {
-        if (name.length() > 50) {
+        if (name.length() == 0 || name.length() > 50) {
             throw new IllegalArgumentException("Name should be <= 50 symbols");
         }
         this.name = name;
@@ -88,7 +88,7 @@ public class User {
     }
 
     public void setSurname(String surname) {
-        if (surname.length() > 50) {
+        if (surname.length() == 0 || surname.length() > 50) {
             throw new IllegalArgumentException("Surname should be <= 50 symbols");
         }
         this.surname = surname;
@@ -99,7 +99,7 @@ public class User {
     }
 
     public void setEmail(String email) {
-        if (email.length() > 50) {
+        if (email.length() == 0 || email.length() > 50) {
             throw new IllegalArgumentException("Email should be <= 50 symbols");
         }
         this.email = email;
@@ -110,7 +110,7 @@ public class User {
     }
 
     public void setPhoneNumber(String phoneNumber) {
-        if (phoneNumber.length() > 30) {
+        if (phoneNumber.length() == 0 || phoneNumber.length() > 30) {
             throw new IllegalArgumentException("Phone number should be <= 30 symbols");
         }
         this.phoneNumber = phoneNumber;
