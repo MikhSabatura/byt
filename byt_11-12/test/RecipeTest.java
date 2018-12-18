@@ -43,6 +43,10 @@ public class RecipeTest {
     @After
     public void tearDown() throws Exception {
         recipe = null;
+        ingredients0 = null;
+        ingredients1 = null;
+        ingredients40 = null;
+        ingredients100 = null;
     }
 
     @Test
